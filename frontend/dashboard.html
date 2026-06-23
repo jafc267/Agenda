@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda — Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="dashboard-page">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">📋</div>
+      <span>Agenda</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="contatos">
+        <span class="nav-icon">👥</span> Contatos
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">A</div>
+        <div>
+          <div class="user-name">Administrador</div>
+          <div class="user-email" id="sidebarEmail">admin@admin.com</div>
+        </div>
+      </div>
+      <button class="btn-logout" id="logoutBtn" title="Sair">⎋ Sair</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <header class="topbar">
+      <div>
+        <h2 class="page-title">Contatos</h2>
+        <p class="page-sub">Gerencie os contatos da agenda</p>
+      </div>
+      <button class="btn btn-primary" id="openModalBtn">
+        + Novo Contato
+      </button>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div>
+          <div class="stat-value" id="totalContatos">—</div>
+          <div class="stat-label">Total de contatos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="🔍  Buscar por nome, e-mail ou telefone…"
+      />
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div id="tableLoading" class="table-loading">Carregando contatos…</div>
+      <div id="tableEmpty" class="table-empty hidden">
+        <div class="empty-icon">📭</div>
+        <p>Nenhum contato cadastrado ainda.</p>
+        <button class="btn btn-primary" id="emptyAddBtn">Adicionar primeiro contato</button>
+      </div>
+      <table id="contatosTable" class="hidden">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="contatosBody"></tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Novo Contato</h3>
+        <button class="modal-close" id="closeModalBtn">✕</button>
+      </div>
+      <form id="contatoForm">
+        <input type="hidden" id="contatoId" />
+        <div class="form-group">
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" placeholder="Ex: João da Silva" required />
+        </div>
+        <div class="form-group">
+          <label for="contatoEmail">E-mail</label>
+          <input type="email" id="contatoEmail" placeholder="joao@email.com" required />
+        </div>
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" placeholder="(34) 99999-9999" required />
+        </div>
+        <div id="formError" class="alert alert-error hidden"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancelModalBtn">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">
+            <span id="saveBtnText">Salvar</span>
+            <span id="saveSpinner" class="spinner hidden"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div id="confirmOverlay" class="modal-overlay hidden">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3>Confirmar exclusão</h3>
+      </div>
+      <p style="padding:0 1.5rem 1rem;color:var(--text-secondary)">
+        Tem certeza que deseja remover este contato? Esta ação não pode ser desfeita.
+      </p>
+      <div class="modal-actions" style="padding:0 1.5rem 1.5rem">
+        <button class="btn btn-secondary" id="cancelDeleteBtn">Cancelar</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
