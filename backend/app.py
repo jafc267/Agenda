@@ -7,14 +7,20 @@ import jwt
 import datetime
 from functools import wraps
 
-load_dotenv()
+load_dotenv(override=False)  # variáveis do Render têm prioridade
 
 app = Flask(__name__)
 CORS(app, origins=["*"])
 
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-SECRET_KEY = os.environ.get("SECRET_KEY", "agenda-secret-key-2024")
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "").strip()
+SECRET_KEY = os.environ.get("SECRET_KEY", "agenda-secret-key-2024").strip()
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError(f"Variáveis ausentes: URL={'OK' if SUPABASE_URL else 'FALTANDO'} KEY={'OK' if SUPABASE_KEY else 'FALTANDO'}")
+
+print(f"[INFO] SUPABASE_URL = {SUPABASE_URL}")
+print(f"[INFO] SUPABASE_KEY = {SUPABASE_KEY[:20]}...")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
