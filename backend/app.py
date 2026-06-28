@@ -10,11 +10,16 @@ from functools import wraps
 load_dotenv(override=False)
 
 app = Flask(__name__)
-CORS(app,
-     origins=["*"],
-     allow_headers=["Content-Type", "Authorization"],
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-     supports_credentials=False)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        res = jsonify({})
+        res.headers["Access-Control-Allow-Origin"] = "*"
+        res.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        res.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        return res, 200
 
 @app.after_request
 def add_cors_headers(response):
@@ -29,9 +34,6 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "agenda-secret-key-2024").strip()
 
 if not SUPABASE_URL or not SUPABASE_KEY:
     raise RuntimeError(f"Variáveis ausentes: URL={'OK' if SUPABASE_URL else 'FALTANDO'} KEY={'OK' if SUPABASE_KEY else 'FALTANDO'}")
-
-print(f"[INFO] SUPABASE_URL = {SUPABASE_URL}")
-print(f"[INFO] SUPABASE_KEY = {SUPABASE_KEY[:20]}...")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -60,10 +62,8 @@ def health():
     return jsonify({"status": "ok", "message": "Agenda API rodando!"})
 
 
-@app.route("/api/login", methods=["POST", "OPTIONS"])
+@app.route("/api/login", methods=["POST"])
 def login():
-    if request.method == "OPTIONS":
-        return jsonify({}), 200
     data = request.get_json()
     email = data.get("email", "").strip().lower()
     password = data.get("password", "")
@@ -82,11 +82,9 @@ def login():
     return jsonify({"token": token, "email": email})
 
 
-@app.route("/api/contatos", methods=["GET", "OPTIONS"])
+@app.route("/api/contatos", methods=["GET"])
 @token_required
 def listar_contatos():
-    if request.method == "OPTIONS":
-        return jsonify({}), 200
     response = (
         supabase.table("contatos")
         .select("*")
@@ -96,11 +94,9 @@ def listar_contatos():
     return jsonify({"contatos": response.data, "total": len(response.data)})
 
 
-@app.route("/api/contatos", methods=["POST", "OPTIONS"])
+@app.route("/api/contatos", methods=["POST"])
 @token_required
 def criar_contato():
-    if request.method == "OPTIONS":
-        return jsonify({}), 200
     data = request.get_json()
     nome = data.get("nome", "").strip()
     email = data.get("email", "").strip().lower()
@@ -121,11 +117,9 @@ def criar_contato():
     return jsonify({"contato": response.data[0]}), 201
 
 
-@app.route("/api/contatos/<int:contato_id>", methods=["PUT", "OPTIONS"])
+@app.route("/api/contatos/<int:contato_id>", methods=["PUT"])
 @token_required
 def atualizar_contato(contato_id):
-    if request.method == "OPTIONS":
-        return jsonify({}), 200
     data = request.get_json()
     nome = data.get("nome", "").strip()
     email = data.get("email", "").strip().lower()
@@ -155,11 +149,9 @@ def atualizar_contato(contato_id):
     return jsonify({"contato": response.data[0]})
 
 
-@app.route("/api/contatos/<int:contato_id>", methods=["DELETE", "OPTIONS"])
+@app.route("/api/contatos/<int:contato_id>", methods=["DELETE"])
 @token_required
 def deletar_contato(contato_id):
-    if request.method == "OPTIONS":
-        return jsonify({}), 200
     response = (
         supabase.table("contatos").delete().eq("id", contato_id).execute()
     )
